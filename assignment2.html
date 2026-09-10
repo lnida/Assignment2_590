@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <title>Assignment2 part 2 Lucy Nida</title>
+    </head>
+    <body>
+        <canvas id="myCanvas" width = "640" height = "480" style= "border: 3px solid #000000; background: lightgoldenrodyellow;"></canvas>
+        <script>
+            "use strict";
+            window.onload = function(){
+                var canvas = document.getElementById("myCanvas");
+                var context = canvas.getContext("2d");
+        
+            //spider's body
+            var body = {
+                x:80,
+                y: canvas.height/2,
+                width: 70,
+                height: 34,
+                color: "black"
+            };
+            //legs
+            var upperleglength = 55;
+            var lowerleglength = 45;
+            
+            var legs = [
+                {attachAngle: -2.5, group: 1},
+                {attachAngle: -2.0, group: 2},
+                {attachAngle: -1.5, group: 1},
+                {attachAngle: -1.0, group: 2},
+                {attachAngle: 2.5, group: 2},
+                {attachAngle: 2.0, group: 1},
+                {attachAngle: 1.5, group: 2},
+                {attachAngle: 1.0, group: 1}
+            ];
+
+            var time = 0;
+            var legSpeed = 0.1;
+            var moveSpeed = 3;
+
+            requestAnimationFrame(mainLoop);
+            function mainLoop(){
+                update();
+                draw();
+                requestAnimationFrame(mainLoop);
+            }
+
+            function update() {
+                time += legSpeed;
+                body.x += moveSpeed;
+                if(body.x > canvas.width -35) {
+                    body.x = canvas.width -35;
+                    moveSpeed *= -1;
+                }
+                if(body.x < 0) {
+                    body.x = 0;
+                    moveSpeed *= -1;
+                }
+            }
+
+            function draw(){
+                context.clearRect(0,0,canvas.width, canvas.height);
+                context.save();
+                context.translate(body.x, body.y);
+
+                for (var i =0; i < legs.length; i++){
+                    drawLeg(legs[i]);
+                }
+                drawBody();
+                context.restore();
+            }
+
+            function drawBody() {
+                context.beginPath();
+                context.ellipse(0,0, body.width /2, body.height/2, 0, 0, 2*Math.PI);
+                context.fillStyle = body.color;
+                context.fill();
+                context.strokeStyle = "black";
+                context.lineWidth = 2;
+                context.stroke();
+            }
+
+            function drawLeg(leg) {
+                if(leg.group === 1){
+                    var sign = 2;
+                    var swing = Math.sin(time + sign * Math.PI) * 0.2;
+
+                } else{
+                    var sign = -1;
+                    var swing = Math.cos(time + sign * Math.PI) * 0.2;
+
+                }
+
+                context.save();
+                context.rotate(leg.attachAngle);
+                context.translate(body.width/4 , 0);
+
+                var upperAngle = swing * 0.8;
+                context.rotate(upperAngle);
+                drawSegment(upperleglength, "brown");
+
+                context.translate(upperleglength, 0);
+                var lift = Math.abs(Math.sin(time + sign * Math.PI)) *0.5;
+                var lowerAngle = 0.9 +lift *0.8;
+                context.rotate(lowerAngle);
+                drawSegment(lowerleglength,"brown");
+                context.restore();
+            }
+
+            function drawSegment(length, color) {
+                context.beginPath();
+                context.moveTo(0,0);
+                context.lineTo(length, 0);
+                context.lineWidth = 6;
+                context.strokeStyle = color;
+                context.lineCap = "round";
+                context.stroke();
+            }
+        
+            };
+        </script>
+    </body>
+</html>
